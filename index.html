@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FEDANI ServiConnect — Plateforme de services</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <!-- Three.js retiré - animation locale -->
+</head>
+<body>
+
+<!-- ══════════ INTRO ANIMATION ══════════ -->
+<div id="intro-screen">
+  <canvas id="intro-canvas"></canvas>
+  <div id="intro-content">
+    <div id="intro-logo">
+      <img src="logo.jpg" id="intro-android-logo" alt="FEDANI Logo" style="width:64px;height:64px;object-fit:contain;border-radius:12px;filter:drop-shadow(0 0 20px rgba(0,170,255,0.8))"/>
+      <div id="intro-brand">
+        <span id="intro-fedani">FEDANI</span>
+        <span id="intro-sub">ServiConnect</span>
+      </div>
+    </div>
+    <div id="intro-tagline">Plateforme de services étudiants</div>
+    <div id="intro-bar"><div id="intro-bar-fill"></div></div>
+    <div id="intro-skip" onclick="skipIntro()">Passer →</div>
+  </div>
+</div>
+
+<!-- ══════════ WELCOME MODAL ══════════ -->
+<div class="modal" id="modalWelcome" style="text-align:center;z-index:9000">
+  <div id="welcomeAnim" style="font-size:4rem;margin-bottom:1rem">🎉</div>
+  <h2 id="welcomeTitle" style="font-family:var(--fh);color:var(--accent);margin-bottom:.75rem"></h2>
+  <p id="welcomeMsg" style="color:var(--text2);line-height:1.7;margin-bottom:1.5rem"></p>
+  <button class="btn-primary big" onclick="closeWelcome()" style="width:100%">Continuer →</button>
+</div>
+<div class="modal-overlay" id="welcomeOverlay"></div>
+
+<!-- ══════════ GLOBAL BANNER ══════════ -->
+<div class="global-banner" id="globalBanner" style="display:none">
+  <span id="bannerMsg"></span>
+  <button onclick="document.getElementById('globalBanner').style.display='none'">✕</button>
+</div>
+
+
+<!-- ══════════ NAVBAR ══════════ -->
+<nav id="navbar">
+  <!-- Logo -->
+  <img src="logo.jpg" alt="FEDANI" class="nav-logo-img" onclick="goPage('home')" style="cursor:pointer"/>
+  <!-- FEDANI ServiConnect -->
+  <div class="nav-brand-text" onclick="goPage('home')">
+    <strong id="navFedani">FEDANI</strong> <span id="navBrandName">ServiConnect</span>
+  </div>
+  <!-- Liens nav (desktop uniquement) -->
+  <div class="nav-links" id="navLinks">
+    <a href="#" class="nav-link active" data-page="home">Accueil</a>
+    <a href="#" class="nav-link" data-page="annonces">Annonces</a>
+    <a href="#" class="nav-link" data-page="services">Services</a>
+    <a href="#" class="nav-link" data-page="boutique">Boutique</a>
+    <a href="#" class="nav-link" data-page="partenaires">Partenaires</a>
+    <a href="#" class="nav-link" data-page="actualites">Actualités</a>
+    <a href="#" class="nav-link" data-page="apropos">À propos</a>
+    <a href="#" class="nav-link" data-page="publier" id="navPublier" style="display:none">Publier</a>
+    <a href="#" class="nav-link" data-page="mesAnnonces" id="navMesAnnonces" style="display:none">Mes annonces</a>
+    <a href="#" class="nav-link" data-page="profil" id="navProfil" style="display:none">Profil</a>
+    <a href="#" class="nav-link admin-link" data-page="admin" id="navAdmin" style="display:none"><i class="fa fa-shield-halved"></i> Admin</a>
+  </div>
+  <!-- Spacer -->
+  <div class="nav-spacer"></div>
+  <!-- ☰ Hamburger — tout à droite -->
+  <button class="hamburger" id="hamburger" aria-label="Menu">
+    <span class="hamburger-line"></span>
+    <span class="hamburger-line"></span>
+    <span class="hamburger-line"></span>
+  </button>
+  <!-- Ligne 2 : 🔔 | Photo | Nom | Déco (desktop) -->
+  <div class="nav-row2" id="navRow2">
+    <div id="notifBell" class="notif-bell notif-bell-nav" onclick="toggleNotifs()">
+      <i class="fa fa-bell"></i>
+      <span class="notif-count" id="notifCount" style="display:none">0</span>
+    </div>
+    <div id="notifPanel" class="notif-panel" style="display:none">
+      <div class="notif-header"><strong>Notifications</strong><button onclick="clearNotifs()">Tout effacer</button></div>
+      <div id="notifList"></div>
+    </div>
+    <div class="nav-auth" id="navAuth">
+      <button class="btn-ghost" id="btnLogin">Connexion</button>
+      <button class="btn-primary" id="btnRegister">S'inscrire</button>
+    </div>
+    <div class="nav-user" id="navUser" style="display:none">
+      <div class="user-avatar-sm" id="navAvatar" onclick="goPage('profil')"></div>
+      <span class="user-name-nav" id="userBadge" onclick="goPage('profil')"></span>
+      <button class="btn-ghost icon-btn desktop-logout" id="btnLogout" title="Déconnexion"><i class="fa fa-right-from-bracket"></i></button>
+    </div>
+  </div>
+</nav>
+<div id="mobileMenuOverlay" onclick="closeMenu()"></div>
+<!-- ══════════ MOBILE DRAWER ══════════ -->
+<div id="mobileDrawer">
+  <div class="drawer-header">
+    <div class="drawer-brand">
+      <img src="logo.jpg" alt="FEDANI" class="drawer-logo"/>
+      <div>
+        <strong>FEDANI</strong>
+        <span>ServiConnect</span>
+      </div>
+    </div>
+    <button class="drawer-close" onclick="closeMenu()"><i class="fa fa-xmark"></i></button>
+  </div>
+  <div class="drawer-body">
+    <div class="drawer-section-label">Navigation</div>
+    <a href="#" class="drawer-link" data-drawer-page="home"><i class="fa fa-house"></i><span>Accueil</span></a>
+    <a href="#" class="drawer-link" data-drawer-page="annonces"><i class="fa fa-list"></i><span>Annonces</span></a>
+    <a href="#" class="drawer-link" data-drawer-page="services"><i class="fa fa-briefcase"></i><span>Services</span></a>
+    <a href="#" class="drawer-link" data-drawer-page="boutique"><i class="fa fa-bag-shopping"></i><span>Boutique</span></a>
+    <a href="#" class="drawer-link" data-drawer-page="partenaires"><i class="fa fa-handshake"></i><span>Partenaires</span></a>
+    <a href="#" class="drawer-link" data-drawer-page="actualites"><i class="fa fa-newspaper"></i><span>Actualités</span></a>
+    <a href="#" class="drawer-link" data-drawer-page="apropos"><i class="fa fa-circle-info"></i><span>À propos</span></a>
+    <div class="drawer-divider"></div>
+    <div class="drawer-section-label" id="drawerUserSection" style="display:none">Mon espace</div>
+    <a href="#" class="drawer-link" data-drawer-page="publier" id="drawerPublier" style="display:none"><i class="fa fa-plus-circle"></i><span>Publier</span></a>
+    <a href="#" class="drawer-link" data-drawer-page="mesAnnonces" id="drawerMesAnnonces" style="display:none"><i class="fa fa-clipboard-list"></i><span>Mes annonces</span></a>
+    <a href="#" class="drawer-link" data-drawer-page="profil" id="drawerProfil" style="display:none"><i class="fa fa-user"></i><span>Profil</span></a>
+    <a href="#" class="drawer-link drawer-admin-link" data-drawer-page="admin" id="drawerAdmin" style="display:none"><i class="fa fa-shield-halved"></i><span>Admin</span></a>
+    <div class="drawer-divider"></div>
+    <div class="drawer-auth-area" id="drawerAuthBtns">
+      <button class="btn-ghost" style="width:100%;justify-content:center;display:flex;gap:.5rem" onclick="closeMenu();openModal('login')"><i class="fa fa-right-to-bracket"></i> Connexion</button>
+      <button class="btn-primary" style="width:100%;justify-content:center;display:flex;gap:.5rem;margin-top:.5rem" onclick="closeMenu();openModal('register')"><i class="fa fa-user-plus"></i> S'inscrire</button>
+    </div>
+    <div class="drawer-user-area" id="drawerUserArea" style="display:none">
+      <div class="drawer-user-info" id="drawerUserInfo"></div>
+      <button class="btn-ghost" style="width:100%;justify-content:center;display:flex;gap:.5rem;margin-top:.75rem;color:var(--red);border-color:var(--red)" onclick="closeMenu();doLogout()"><i class="fa fa-right-from-bracket"></i> Déconnexion</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ MAIN APP ══════════ -->
+<main id="app">
+
+<!-- ═══ HOME ═══ -->
+<section class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-bg"></div>
+    <div id="particles-bg"></div>
+    <div class="hero-content">
+      <div class="hero-tag" id="heroTag">🇨🇲 Plateforme étudiante camerounaise — FEDANI</div>
+      <h1 id="heroTitle">Trouve un service.<br><em id="heroTitleEm">Propose le tien.</em></h1>
+      <p class="hero-sub" id="heroSub">Cours particuliers, correction de devoirs, design, programmation…<br>Connecte-toi avec des prestataires près de chez toi.</p>
+      <div class="hero-actions">
+        <button class="btn-primary big" onclick="goPage('annonces')"><i class="fa fa-search"></i> Voir les annonces</button>
+        <button class="btn-outline big" onclick="goPage('publier')"><i class="fa fa-plus"></i> Publier un service</button>
+        <button class="btn-ai big" onclick="openAI()"><i class="fa fa-robot"></i> Assistant IA</button>
+      </div>
+      <div class="quick-guide">
+        <p class="quick-title">👋 Par où commencer ? Touche une carte :</p>
+        <div class="quick-grid">
+          <button onclick="openModal('register')"><i class="fa fa-user-plus"></i><b>1. Créer mon compte</b><small>Gratuit, 1 minute</small></button>
+          <button onclick="goPage('publier')"><i class="fa fa-plus-circle"></i><b>2. Publier un service</b><small>Vends ton savoir-faire</small></button>
+          <button onclick="goPage('annonces')"><i class="fa fa-search"></i><b>3. Voir les annonces</b><small>Trouve un prestataire</small></button>
+          <button onclick="goPage('actualites')"><i class="fa fa-newspaper"></i><b>4. Actualités</b><small>Offres, emplois, événements</small></button>
+          <button onclick="goPage('partenaires')"><i class="fa fa-handshake"></i><b>5. Devenir partenaire</b><small>Envoie ta demande</small></button>
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="floating-card c1"><span>📐</span><p>Cours de Maths</p><small>Douala · 2 500 F/h</small></div>
+      <div class="floating-card c2"><span>💻</span><p>Programmation Web</p><small>Bafoussam · 3 000 F</small></div>
+      <div class="floating-card c3"><span>🎨</span><p>Design Graphique</p><small>Yaoundé · Négociable</small></div>
+    </div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat"><strong id="statAnnonces">0</strong><span>Annonces actives</span></div>
+    <div class="stat"><strong id="statUsers">0</strong><span>Utilisateurs inscrits</span></div>
+    <div class="stat"><strong id="statVisites">0</strong><span>Visiteurs uniques</span></div>
+    <div class="stat"><strong>100%</strong><span>Gratuit</span></div>
+  </div>
+
+  <!-- Offres spéciales -->
+  <div class="offres-section">
+    <h2>🔥 Offres spéciales sur nos services</h2>
+    <p class="section-sub">Des promotions exclusives pour nos utilisateurs FEDANI</p>
+    <div class="offres-grid" id="offresGrid">
+      <div class="offre-card" data-offre-id="o1">
+        <div class="offre-badge">-30%</div>
+        <div class="offre-img-wrap"><img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=500&q=80" alt="Cours de soutien" class="offre-img" onerror="this.parentNode.innerHTML='📚'"/></div>
+        <div class="offre-icon" style="display:none">📚</div>
+        <h3>Cours de soutien</h3>
+        <p>Première séance de cours particulier à -30% pour tout nouvel étudiant inscrit sur FEDANI.</p>
+        <span class="offre-validity">Valable jusqu'au 31 décembre</span>
+        <button class="btn-primary" onclick="filterCategory('Cours')">Voir les offres</button>
+      </div>
+      <div class="offre-card" data-offre-id="o2">
+        <div class="offre-badge">-20%</div>
+        <div class="offre-img-wrap"><img src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=500&q=80" alt="Programmation" class="offre-img" onerror="this.parentNode.innerHTML='💻'"/></div>
+        <div class="offre-icon" style="display:none">💻</div>
+        <h3>Pack Programmation</h3>
+        <p>5 séances de programmation au prix de 4. Formation complète HTML/CSS/JS pour débutants.</p>
+        <span class="offre-validity">Offre limitée</span>
+        <button class="btn-primary" onclick="filterCategory('Programmation')">Voir les offres</button>
+      </div>
+      <div class="offre-card" data-offre-id="o3">
+        <div class="offre-badge">Gratuit</div>
+        <div class="offre-img-wrap"><img src="https://images.unsplash.com/photo-1455390582262-044cdead277a?w=500&q=80" alt="Correction" class="offre-img" onerror="this.parentNode.innerHTML='✏️'"/></div>
+        <div class="offre-icon" style="display:none">✏️</div>
+        <h3>1ère correction offerte</h3>
+        <p>Première correction de devoir offerte pour tout utilisateur nouvellement inscrit sur la plateforme.</p>
+        <span class="offre-validity">Sans engagement</span>
+        <button class="btn-primary" onclick="filterCategory('Correction')">Voir les offres</button>
+      </div>
+      <div class="offre-card" data-offre-id="o4">
+        <div class="offre-badge">-15%</div>
+        <div class="offre-img-wrap"><img src="https://images.unsplash.com/photo-1561070791-2526d30994b5?w=500&q=80" alt="Design Logo" class="offre-img" onerror="this.parentNode.innerHTML='🎨'"/></div>
+        <div class="offre-icon" style="display:none">🎨</div>
+        <h3>Design Logo Pro</h3>
+        <p>Création de logo professionnel à tarif réduit. Package complet : logo + charte graphique de base.</p>
+        <span class="offre-validity">Pour les entrepreneurs</span>
+        <button class="btn-primary" onclick="filterCategory('Design')">Voir les offres</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="categories-section">
+    <h2 id="catSectionTitle">Parcourir par catégorie</h2>
+    <div class="categories-grid" id="categoriesGrid"></div>
+  </div>
+
+  <!-- Paiements section -->
+  <div class="payment-section">
+    <h2>💳 Moyens de paiement acceptés</h2>
+    <p class="section-sub">Paiements sécurisés, rapides et fiables pour tous les services</p>
+    <div class="payment-grid">
+      <!-- MTN Mobile Money -->
+      <div class="pay-card">
+        <div class="pay-icon-wrap" style="background:#0a66c2;border-radius:12px;padding:8px 14px;display:flex;align-items:center;justify-content:center;min-height:52px">
+          <svg viewBox="0 0 120 40" width="90" height="30" xmlns="http://www.w3.org/2000/svg"><rect width="120" height="40" fill="#0a66c2" rx="4"/><text x="8" y="28" font-family="Arial Black,sans-serif" font-weight="900" font-size="22" fill="#000">MTN</text><circle cx="98" cy="20" r="15" fill="#000"/><text x="86" y="17" font-family="Arial,sans-serif" font-weight="700" font-size="8" fill="#0a66c2">Mobile</text><text x="86" y="27" font-family="Arial,sans-serif" font-weight="700" font-size="8" fill="#0a66c2">Money</text></svg>
+        </div>
+        <strong>MTN Mobile Money</strong><small>Paiement instantané</small>
+      </div>
+      <!-- Orange Money -->
+      <div class="pay-card">
+        <div class="pay-icon-wrap" style="background:#0088dd;border-radius:12px;padding:8px 14px;display:flex;align-items:center;justify-content:center;min-height:52px">
+          <svg viewBox="0 0 120 40" width="90" height="30" xmlns="http://www.w3.org/2000/svg"><rect width="120" height="40" fill="#0088dd" rx="4"/><circle cx="22" cy="20" r="13" fill="#fff"/><circle cx="22" cy="20" r="8" fill="#0088dd"/><text x="42" y="25" font-family="Arial,sans-serif" font-weight="700" font-size="13" fill="#fff">Orange</text><text x="42" y="37" font-family="Arial,sans-serif" font-size="10" fill="#ffe0c0">Money</text></svg>
+        </div>
+        <strong>Orange Money</strong><small>Simple et rapide</small>
+      </div>
+      <!-- Express Union -->
+      <div class="pay-card">
+        <div class="pay-icon-wrap" style="background:#0a0a1a;border-radius:12px;padding:8px 14px;display:flex;align-items:center;justify-content:center;min-height:52px;border:1px solid #f5c518">
+          <svg viewBox="0 0 120 40" width="90" height="30" xmlns="http://www.w3.org/2000/svg"><rect width="120" height="40" fill="#0a0a1a" rx="4"/><polygon points="8,8 20,8 26,20 20,32 8,32 14,20" fill="#f5c518"/><text x="32" y="17" font-family="Arial Black,sans-serif" font-weight="900" font-size="9" fill="#f5c518">EXPRESS</text><text x="32" y="30" font-family="Arial Black,sans-serif" font-weight="900" font-size="9" fill="#fff">UNION</text></svg>
+        </div>
+        <strong>Express Union</strong><small>Transfert sécurisé</small>
+      </div>
+      <!-- PayPal -->
+      <div class="pay-card">
+        <div class="pay-icon-wrap" style="background:#003087;border-radius:12px;padding:8px 14px;display:flex;align-items:center;justify-content:center;min-height:52px">
+          <svg viewBox="0 0 120 40" width="90" height="30" xmlns="http://www.w3.org/2000/svg"><rect width="120" height="40" fill="#003087" rx="4"/><text x="8" y="28" font-family="Arial,sans-serif" font-weight="700" font-size="22" fill="#009cde">Pay</text><text x="48" y="28" font-family="Arial,sans-serif" font-weight="700" font-size="22" fill="#fff">Pal</text></svg>
+        </div>
+        <strong>PayPal</strong><small>Paiements internationaux</small>
+      </div>
+      <!-- Visa / Mastercard -->
+      <div class="pay-card">
+        <div class="pay-icon-wrap" style="background:#1a1f71;border-radius:12px;padding:6px 10px;display:flex;align-items:center;justify-content:center;gap:6px;min-height:52px">
+          <svg viewBox="0 0 72 24" width="56" height="19" xmlns="http://www.w3.org/2000/svg"><rect width="72" height="24" fill="#1a1f71" rx="2"/><text x="4" y="18" font-family="Arial,sans-serif" font-weight="900" font-size="16" fill="#fff" letter-spacing="-1">VISA</text></svg>
+          <svg viewBox="0 0 46 30" width="38" height="25" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="15" r="13" fill="#EB001B"/><circle cx="30" cy="15" r="13" fill="#F79E1B"/><path d="M23 4.5 A13 13 0 0 1 23 25.5 A13 13 0 0 1 23 4.5Z" fill="#FF5F00"/></svg>
+        </div>
+        <strong>Carte Bancaire</strong><small>Visa / Mastercard</small>
+      </div>
+      <!-- Cash -->
+      <div class="pay-card">
+        <div class="pay-icon-wrap" style="background:#0d3324;border-radius:12px;padding:8px 14px;display:flex;align-items:center;justify-content:center;min-height:52px;border:1px solid #2ecc71">
+          <svg viewBox="0 0 120 40" width="90" height="30" xmlns="http://www.w3.org/2000/svg"><rect width="120" height="40" fill="#0d3324" rx="4"/><rect x="6" y="9" width="108" height="22" rx="3" fill="#1a5e3a" stroke="#2ecc71" stroke-width="1.5"/><circle cx="28" cy="20" r="7" fill="none" stroke="#2ecc71" stroke-width="1.5"/><text x="23" y="25" font-family="Arial Black,sans-serif" font-weight="900" font-size="13" fill="#2ecc71">$</text><line x1="48" y1="14" x2="108" y2="14" stroke="#2ecc71" stroke-width="1" opacity=".4"/><line x1="48" y1="20" x2="108" y2="20" stroke="#2ecc71" stroke-width="1.5" opacity=".6"/><line x1="48" y1="26" x2="108" y2="26" stroke="#2ecc71" stroke-width="1" opacity=".4"/></svg>
+        </div>
+        <strong>Cash</strong><small>En main propre</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="latest-section">
+    <h2>Dernières annonces</h2>
+    <div class="annonces-grid" id="homeAnnonces"></div>
+    <div style="text-align:center;margin-top:2rem">
+      <button class="btn-outline" onclick="goPage('annonces')">Voir toutes les annonces →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ ANNONCES ═══ -->
+<section class="page" id="page-annonces">
+  <div class="page-header">
+    <h1>Toutes les annonces</h1>
+    <p>Trouve le service qu'il te faut, contacte directement le prestataire.</p>
+  </div>
+  <div class="filters-bar">
+    <input type="text" id="searchInput" placeholder="🔍 Rechercher..." oninput="renderAnnonces()"/>
+    <select id="filterCat" onchange="renderAnnonces()">
+      <option value="">Toutes les catégories</option>
+      <option>Cours</option><option>Correction</option><option>Programmation</option>
+      <option>Design</option><option>Recherche</option><option>Traduction</option>
+      <option>Rédaction</option><option>Musique</option><option>Sport</option><option>Autre</option>
+    </select>
+    <select id="filterVille" onchange="renderAnnonces()">
+      <option value="">Toutes les villes</option>
+      <option>Douala</option><option>Yaoundé</option><option>Bafoussam</option>
+      <option>Bandjoun</option><option>Buea</option><option>Bamenda</option><option>Autre</option>
+    </select>
+    <select id="filterMode" onchange="renderAnnonces()">
+      <option value="">Tout mode</option>
+      <option>En personne</option><option>En ligne</option><option>Les deux</option>
+    </select>
+    <select id="filterSort" onchange="renderAnnonces()">
+      <option value="date">Plus récent</option>
+      <option value="alpha">A → Z</option>
+      <option value="ville">Par ville</option>
+    </select>
+  </div>
+  <div class="annonces-grid" id="annoncesGrid"></div>
+  <div class="empty-state" id="emptyAnnonces" style="display:none">
+    <span>📭</span><p>Aucune annonce trouvée.</p>
+    <button class="btn-primary" onclick="goPage('publier')">Publier la première</button>
+  </div>
+</section>
+
+<!-- ═══ DETAIL ANNONCE ═══ -->
+<section class="page" id="page-detail">
+  <div id="detailContent"></div>
+</section>
+
+<!-- ═══ SERVICES ═══ -->
+<section class="page" id="page-services">
+  <div class="page-header">
+    <h1>Nos Services</h1>
+    <p>Tout ce que FEDANI ServiConnect met à ta disposition.</p>
+  </div>
+  <div class="services-big-grid" id="servicesBigGrid">
+    <!-- Services are rendered dynamically including admin-added ones -->
+  </div>
+</section>
+
+<!-- ═══ PARTENAIRES ═══ -->
+<section class="page" id="page-boutique">
+  <div class="page-header"><h1>🛍️ Boutique</h1><p>Produits numériques, services à prix fixe et petit matériel.</p></div>
+  <div id="boutiqueRoot" class="boutique"></div>
+</section>
+
+<section class="page" id="page-partenaires">
+  <div class="page-header">
+    <h1>Nos Partenaires</h1>
+    <p>Les institutions et entreprises qui font confiance à FEDANI ServiConnect.</p>
+  </div>
+  <div class="partenaires-hero">
+    <p>FEDANI ServiConnect collabore avec des institutions académiques, des entreprises technologiques et des organismes de développement pour offrir les meilleures opportunités à nos utilisateurs.</p>
+  </div>
+  <div class="partenaires-grid" id="partenairesGrid"></div>
+  <div class="become-partner">
+    <h2>Devenir Partenaire ?</h2>
+    <p>Vous représentez une institution, une entreprise ou un organisme ? Rejoignez l'écosystème FEDANI.</p>
+    <button class="btn-primary big" onclick="openPartnerChat()">💬 Nous contacter pour un partenariat</button>
+  </div>
+</section>
+
+<!-- ═══ ACTUALITÉS ═══ -->
+<section class="page" id="page-actualites">
+  <div class="page-header">
+    <h1>Actualités & Professionnel</h1>
+    <p>Les dernières nouvelles de FEDANI et opportunités professionnelles au Cameroun.</p>
+  </div>
+  <div class="actu-filters">
+    <button class="actu-filter-btn active" onclick="filterActus('all',this)">Tout</button>
+    <button class="actu-filter-btn" onclick="filterActus('actu',this)">📰 Actualités</button>
+    <button class="actu-filter-btn" onclick="filterActus('pro',this)">💼 Professionnel</button>
+    <button class="actu-filter-btn" onclick="filterActus('event',this)">📅 Événements</button>
+  </div>
+  <div class="actu-grid" id="actuGrid"></div>
+</section>
+
+<!-- ═══ À PROPOS ═══ -->
+<section class="page" id="page-apropos">
+  <div class="page-header">
+    <h1>À propos de FEDANI</h1>
+    <p>Notre mission, notre vision et notre équipe.</p>
+  </div>
+
+  <div class="about-hero">
+    <div class="about-logo-big">
+      <img src="logo.jpg" alt="FEDANI" style="width:80px;height:80px;object-fit:contain;border-radius:14px;filter:drop-shadow(0 0 20px rgba(0,170,255,0.6))"/>
+    </div>
+    <div>
+      <h2>FEDANI ServiConnect</h2>
+      <p class="about-tagline">Connecting talent. Empowering youth.</p>
+      <p>FEDANI est une entreprise camerounaise fondée avec la vision de connecter les talents étudiants avec ceux qui ont besoin de leurs services. Notre plateforme ServiConnect est le premier marché de services entre étudiants et jeunes professionnels du Cameroun.</p>
+    </div>
+  </div>
+
+  <div class="about-values">
+    <div class="value-card"><span>🎯</span><h4>Mission</h4><p>Faciliter l'accès aux services académiques et professionnels pour tous les Camerounais, partout au pays.</p></div>
+    <div class="value-card"><span>🔭</span><h4>Vision</h4><p>Devenir la plateforme de référence pour les services entre jeunes en Afrique centrale à l'horizon 2030.</p></div>
+    <div class="value-card"><span>💎</span><h4>Valeurs</h4><p>Excellence, intégrité, innovation et solidarité. Nous croyons en la puissance du talent camerounais.</p></div>
+  </div>
+
+  <div class="team-section">
+    <h2>L'équipe dirigeante</h2>
+    <div class="team-grid" id="teamGrid"></div>
+  </div>
+
+  <!-- Droits d'auteur -->
+  <div class="copyright-section">
+    <div class="copyright-box">
+      <h3>⚖️ Droits d'auteur & Propriété intellectuelle</h3>
+      <div class="copyright-content">
+        <p><strong>© 2024–2026 FEDANI ServiConnect. Tous droits réservés.</strong></p>
+        <p>La plateforme FEDANI ServiConnect, incluant son code source, son design, ses textes, ses logos, ses graphismes et l'ensemble de ses contenus, est la propriété exclusive de <strong>FEDANI</strong>, entreprise de droit camerounais.</p>
+        <div class="copyright-grid">
+          <div class="cr-item"><span>🔒</span><strong>Protection du code</strong><p>Le code source de cette plateforme est protégé par le droit camerounais de la propriété intellectuelle et les lois sur le droit d'auteur.</p></div>
+          <div class="cr-item"><span>🎨</span><strong>Design & Marque</strong><p>Le logo, le nom "FEDANI", le nom "ServiConnect" et leur combinaison sont des marques déposées.</p></div>
+          <div class="cr-item"><span>📋</span><strong>Contenu utilisateur</strong><p>Les annonces publiées par les utilisateurs restent leur propriété. En les publiant sur FEDANI ServiConnect, ils accordent une licence d'affichage non exclusive.</p></div>
+          <div class="cr-item"><span>⚠️</span><strong>Usage autorisé</strong><p>L'utilisation de la plateforme est autorisée pour un usage personnel et non commercial.</p></div>
+        </div>
+        <p class="cr-footer">Pour toute demande relative aux droits d'auteur : <a href="mailto:fedanisarl1@gmail.com">fedanisarl1@gmail.com</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact -->
+  <div class="contact-section">
+    <h2>📬 Nous contacter</h2>
+    <div class="contact-grid">
+      <a href="mailto:fedanisarl1@gmail.com" class="contact-item clickable"><i class="fa fa-envelope"></i><span>fedanisarl1@gmail.com</span></a>
+      <a href="tel:+237696837926" class="contact-item clickable"><i class="fa fa-phone"></i><span>+237 696 837 926</span></a>
+      <a href="https://wa.me/237696837926" target="_blank" class="contact-item clickable"><i class="fab fa-whatsapp" style="color:#25d366"></i><span>WhatsApp : 696 837 926</span></a>
+      <div class="contact-item"><i class="fa fa-location-dot"></i><span>Douala, Cameroun</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PUBLIER ═══ -->
+<section class="page" id="page-publier">
+  <div class="page-header">
+    <h1>Publier une annonce</h1>
+    <p>Décris ton service pour que les clients te trouvent facilement.</p>
+  </div>
+  <div class="form-card" id="publierFormCard">
+    <div class="auth-required" id="authRequired">
+      <span>🔐</span><p>Tu dois être connecté(e) pour publier une annonce.</p>
+      <button class="btn-primary" onclick="openModal('login')">Se connecter</button>
+    </div>
+    <form id="publierForm" style="display:none" onsubmit="submitAnnonce(event)">
+      <div class="img-upload-zone" id="imgUploadZone" onclick="document.getElementById('imgFileInput').click()">
+        <div class="img-upload-placeholder" id="imgPlaceholder"><i class="fa fa-image"></i><p>Clique pour ajouter une image</p><small>JPG, PNG — Max 2 Mo</small></div>
+        <img id="imgPreview" style="display:none" alt="Aperçu"/>
+        <button type="button" class="img-remove-btn" id="imgRemoveBtn" style="display:none" onclick="removeImage(event,'imgPreview','imgPlaceholder','imgRemoveBtn','imgFileInput')">✕</button>
+        <input type="file" id="imgFileInput" accept="image/*" style="display:none" onchange="previewImage(this,'imgPreview','imgPlaceholder','imgRemoveBtn')"/>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Titre *</label><input type="text" id="pTitre" placeholder="Ex: Cours de maths niveau lycée" required/></div>
+        <div class="form-group"><label>Catégorie *</label>
+          <select id="pCategorie" required>
+            <option value="">Choisir...</option>
+            <option>Cours</option><option>Correction</option><option>Programmation</option>
+            <option>Design</option><option>Recherche</option><option>Traduction</option>
+            <option>Rédaction</option><option>Musique</option><option>Sport</option><option>Autre</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label>Description *</label><textarea id="pDesc" rows="5" placeholder="Décris ton service en détail..." required></textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label>Ville *</label>
+          <select id="pVille" required>
+            <option value="">Choisir...</option>
+            <option>Douala</option><option>Yaoundé</option><option>Bafoussam</option>
+            <option>Bandjoun</option><option>Buea</option><option>Bamenda</option><option>Autre</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Quartier / Lieu</label><input type="text" id="pQuartier" placeholder="Ex: Akwa, Bastos..."/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Prix</label><input type="text" id="pPrix" placeholder="Ex: 2 500 F/h ou Négociable"/></div>
+        <div class="form-group"><label>Mode</label>
+          <select id="pMode"><option value="">Non précisé</option><option>En personne</option><option>En ligne</option><option>Les deux</option></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Téléphone / WhatsApp *</label><input type="tel" id="pTel" placeholder="Ex: 6 77 88 99 00" required/></div>
+        <div class="form-group"><label>Email</label><input type="email" id="pEmail" placeholder="ton@email.com"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Paiement accepté</label>
+          <select id="pPaiement"><option value="">Non précisé</option><option>MTN Mobile Money</option><option>Orange Money</option><option>Express Union</option><option>Cash</option><option>PayPal</option><option>Tout mode</option></select>
+        </div>
+        <div class="form-group"><label>Disponibilité</label><input type="text" id="pDispo" placeholder="Ex: Lun-Ven, 17h-20h"/></div>
+      </div>
+      <div class="form-group"><label>Tags (séparés par virgules)</label><input type="text" id="pTags" placeholder="Ex: BEPC, lycée, trigonométrie"/></div>
+      <button type="submit" class="btn-primary big" style="width:100%">✅ Publier l'annonce</button>
+    </form>
+  </div>
+</section>
+
+<!-- ═══ MES ANNONCES ═══ -->
+<section class="page" id="page-mesAnnonces">
+  <div class="page-header"><h1>Mes annonces</h1><p>Gère tes annonces publiées.</p></div>
+  <div class="annonces-grid" id="mesAnnoncesGrid"></div>
+  <div class="empty-state" id="emptyMesAnnonces" style="display:none">
+    <span>📝</span><p>Tu n'as pas encore publié d'annonces.</p>
+    <button class="btn-primary" onclick="goPage('publier')">Publier maintenant</button>
+  </div>
+</section>
+
+<!-- ═══ PROFIL ═══ -->
+<section class="page" id="page-profil">
+  <div class="page-header"><h1>Mon profil</h1><p>Modifie tes informations personnelles.</p></div>
+  <div class="form-card">
+    <div class="profil-avatar-zone">
+      <div class="profil-avatar-big" id="profilAvatarBig" onclick="document.getElementById('avatarFileInput').click()">
+        <div class="avatar-overlay"><i class="fa fa-camera"></i></div>
+      </div>
+      <div><p style="font-weight:600">Photo de profil</p><small style="color:var(--text2)">Clique pour changer</small>
+        <input type="file" id="avatarFileInput" accept="image/*" style="display:none" onchange="changeAvatar(this)"/>
+      </div>
+    </div>
+    <form onsubmit="saveProfil(event)">
+      <div class="form-row">
+        <div class="form-group"><label>Nom complet *</label><input type="text" id="profilNom" required/></div>
+        <div class="form-group"><label>Email *</label><input type="email" id="profilEmail" required/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Téléphone</label><input type="tel" id="profilTel"/></div>
+        <div class="form-group"><label>Ville</label>
+          <select id="profilVille"><option value="">Non précisé</option><option>Douala</option><option>Yaoundé</option><option>Bafoussam</option><option>Bandjoun</option><option>Buea</option><option>Bamenda</option><option>Autre</option></select>
+        </div>
+      </div>
+      <div class="form-group"><label>Bio</label><textarea id="profilBio" rows="3" placeholder="Décris-toi..."></textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label>Nouveau mot de passe</label><input type="password" id="profilPass" minlength="6"/></div>
+        <div class="form-group"><label>Confirmer</label><input type="password" id="profilPass2"/></div>
+      </div>
+      <button type="submit" class="btn-primary big" style="width:100%">💾 Sauvegarder</button>
+    </form>
+  </div>
+</section>
+
+<!-- ═══ ADMIN ═══ -->
+<section class="page" id="page-admin">
+  <div class="admin-hero">
+    <span>🛡️</span>
+    <div><h1>Panneau Administrateur FEDANI</h1><p>Contrôle total — annonces, utilisateurs, visites, contenu, services, équipe</p></div>
+  </div>
+  <div class="admin-tabs" id="adminTabsBar">
+    <button class="tab-btn active" onclick="adminTab('dashboard',this)"><i class="fa fa-chart-line"></i> Dashboard</button>
+    <button class="tab-btn" onclick="adminTab('annonces',this)"><i class="fa fa-list"></i> Annonces <span class="tab-count" id="cntAnn">0</span></button>
+    <button class="tab-btn" onclick="adminTab('users',this)"><i class="fa fa-users"></i> Utilisateurs <span class="tab-count" id="cntUsers">0</span></button>
+    <button class="tab-btn" onclick="adminTab('visites',this)"><i class="fa fa-eye"></i> Visites <span class="tab-count" id="cntVisites">0</span></button>
+    <button class="tab-btn" onclick="adminTab('services',this)"><i class="fa fa-briefcase"></i> Services</button>
+    <button class="tab-btn" onclick="adminTab('team',this)"><i class="fa fa-people-group"></i> Équipe</button>
+    <button class="tab-btn" onclick="adminTab('messages',this)"><i class="fa fa-comments"></i> Messages <span class="tab-count" id="cntMsgs">0</span></button>
+    <button class="tab-btn" onclick="adminTab('actualites',this)"><i class="fa fa-newspaper"></i> Actualités</button>
+    <button class="tab-btn" onclick="adminTab('partenaires',this)"><i class="fa fa-handshake"></i> Partenaires</button>
+    <button class="tab-btn" onclick="adminTab('db',this)"><i class="fa fa-database"></i> Base de données</button>
+    <button class="tab-btn" onclick="adminTab('secu',this)"><i class="fa fa-shield-halved"></i> Sécurité</button>
+    <button class="tab-btn" onclick="adminTab('site',this)"><i class="fa fa-pen-nib"></i> Site</button>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="tab-dashboard" class="admin-tab-content active">
+    <div class="dashboard-grid">
+      <div class="dash-card accent" role="button" tabindex="0" onclick="dashGo('annonces')" onkeydown="if(event.key==='Enter')dashGo('annonces')"><span class="dash-ico">📋</span><strong id="dAnn">0</strong><small>Annonces totales</small></div>
+      <div class="dash-card" role="button" tabindex="0" onclick="dashGo('users')" onkeydown="if(event.key==='Enter')dashGo('users')"><span class="dash-ico">👤</span><strong id="dUsers">0</strong><small>Utilisateurs inscrits</small></div>
+      <div class="dash-card" role="button" tabindex="0" onclick="dashGo('visites')" onkeydown="if(event.key==='Enter')dashGo('visites')"><span class="dash-ico">👁️</span><strong id="dVisites">0</strong><small>Visiteurs uniques</small></div>
+      <div class="dash-card" role="button" tabindex="0" onclick="dashGo('visites')" onkeydown="if(event.key==='Enter')dashGo('visites')"><span class="dash-ico">📅</span><strong id="dToday">0</strong><small>Visites aujourd'hui</small></div>
+      <div class="dash-card" role="button" tabindex="0" onclick="dashGo('annonces')" onkeydown="if(event.key==='Enter')dashGo('annonces')"><span class="dash-ico">✅</span><strong id="dActive">0</strong><small>Annonces visibles</small></div>
+      <div class="dash-card" role="button" tabindex="0" onclick="dashGo('users')" onkeydown="if(event.key==='Enter')dashGo('users')"><span class="dash-ico">🆕</span><strong id="dNew">0</strong><small>Inscrits (7j)</small></div>
+    </div>
+    <div style="padding:0 2rem 2rem"><h3 style="font-family:var(--fh);margin-bottom:1rem">Annonces récentes</h3>
+      <div class="annonces-grid" id="dashRecentAnn" style="padding:0"></div>
+    </div>
+  </div>
+
+  <!-- Annonces admin -->
+  <div id="tab-annonces" class="admin-tab-content" style="display:none">
+    <div class="admin-toolbar">
+      <input type="text" id="adminSearchAnn" placeholder="🔍 Rechercher..." oninput="renderAdminAnnonces()" style="max-width:280px"/>
+      <select id="adminFilterCat" onchange="renderAdminAnnonces()" style="width:auto"><option value="">Toutes</option><option>Cours</option><option>Correction</option><option>Programmation</option><option>Design</option><option>Recherche</option><option>Autre</option></select>
+      <button class="btn-danger" onclick="deleteAllAnnonces()"><i class="fa fa-trash"></i> Tout supprimer</button>
+    </div>
+    <div class="annonces-grid admin-grid" id="adminAnnoncesGrid"></div>
+  </div>
+
+  <!-- Users admin -->
+  <div id="tab-users" class="admin-tab-content" style="display:none">
+    <div class="admin-toolbar">
+      <input type="text" id="adminSearchUser" placeholder="🔍 Rechercher..." oninput="renderAdminUsers()" style="max-width:300px"/>
+    </div>
+    <div class="users-table-wrap">
+      <table class="users-table">
+        <thead><tr><th>Avatar</th><th>Nom</th><th>Email</th><th>Tél</th><th>Ville</th><th>Rôle</th><th>Annonces</th><th>Inscrit</th><th>Actions</th></tr></thead>
+        <tbody id="adminUsersBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Visites admin -->
+  <div id="tab-visites" class="admin-tab-content" style="display:none">
+    <div class="admin-toolbar">
+      <span style="color:var(--text2);font-size:.9rem"><i class="fa fa-circle-info"></i> Visiteurs uniques</span>
+      <button class="btn-danger" onclick="clearVisits()"><i class="fa fa-trash"></i> Effacer</button>
+    </div>
+    <div class="visits-log" id="visitsLog"></div>
+  </div>
+
+  <!-- Services admin -->
+  <div id="tab-services" class="admin-tab-content" style="display:none">
+    <div class="admin-toolbar">
+      <h3 style="font-family:var(--fh)">Gérer les services</h3>
+      <button class="btn-primary" onclick="openAddService()"><i class="fa fa-plus"></i> Ajouter un service</button>
+    </div>
+    <div class="services-admin-grid" id="servicesAdminGrid"></div>
+  </div>
+
+  <!-- Team admin -->
+  <div id="tab-team" class="admin-tab-content" style="display:none">
+    <div class="admin-toolbar">
+      <h3 style="font-family:var(--fh)">Gérer l'équipe dirigeante</h3>
+      <button class="btn-primary" onclick="openAddTeamMember()"><i class="fa fa-plus"></i> Ajouter un membre</button>
+    </div>
+    <div class="team-admin-grid" id="teamAdminGrid"></div>
+  </div>
+
+  <!-- Messages admin -->
+  <div id="tab-messages" class="admin-tab-content" style="display:none">
+    <div class="admin-toolbar"><h3 style="font-family:var(--fh)">Messages de demandes partenariat</h3></div>
+    <div id="adminMessagesList" style="padding:1rem 2rem;display:flex;flex-direction:column;gap:1rem"></div>
+  </div>
+
+  <!-- Actualités admin -->
+  <div id="tab-actualites" class="admin-tab-content" style="display:none">
+    <div class="admin-toolbar">
+      <h3 style="font-family:var(--fh)">Gérer les actualités</h3>
+      <button class="btn-primary" onclick="openAddActu()"><i class="fa fa-plus"></i> Ajouter</button>
+    </div>
+    <div id="actuAdminList" style="padding:1rem 2rem;display:flex;flex-direction:column;gap:.75rem"></div>
+  </div>
+
+  <!-- Partenaires admin -->
+  <div id="tab-partenaires" class="admin-tab-content" style="display:none">
+    <div class="admin-toolbar">
+      <h3 style="font-family:var(--fh)">Gérer les partenaires</h3>
+      <button class="btn-primary" onclick="openAddPartner()"><i class="fa fa-plus"></i> Ajouter un partenaire</button>
+    </div>
+    <div class="partenaires-grid" id="partenairesAdminGrid" style="padding:1rem 2rem"></div>
+  </div>
+  <!-- Base de données admin -->
+  <div id="tab-db" class="admin-tab-content" style="display:none">
+    <div class="admin-toolbar">
+      <div id="dbCols" class="db-cols"></div>
+      <input type="text" id="dbNewCol" placeholder="Autre collection…" style="max-width:170px"/>
+      <button class="btn-primary" onclick="dbAddCol()"><i class="fa fa-plus"></i></button>
+      <input type="text" id="dbSearch" placeholder="🔍 Filtrer…" oninput="dbRenderRows()" style="max-width:220px"/>
+      <button class="tab-btn" onclick="dbLoad(DB.cur)"><i class="fa fa-rotate"></i> Actualiser</button>
+      <button class="tab-btn" onclick="dbExport()"><i class="fa fa-download"></i> Exporter JSON</button>
+    </div>
+    <div class="db-wrap">
+      <div class="db-info" id="dbInfo"></div>
+      <div class="users-table-wrap" style="padding:0"><table class="users-table"><thead id="dbHead"></thead><tbody id="dbBody"></tbody></table></div>
+      <div class="db-viewer" id="dbViewer" style="display:none"><div class="db-viewer-bar"><strong id="dbViewerTitle"></strong><button class="tab-btn" onclick="dbCopy()"><i class="fa fa-copy"></i> Copier</button><button class="tab-btn" onclick="document.getElementById('dbViewer').style.display='none'">✕</button></div><pre id="dbViewerPre"></pre></div>
+      <h3 class="db-h3">💾 Stockage du navigateur (services, équipe, partenaires, messages, visites…)</h3>
+      <div id="dbLocal"></div>
+    </div>
+  </div>
+
+  <!-- Sécurité admin -->
+  <div id="tab-secu" class="admin-tab-content" style="display:none">
+    <div class="admin-toolbar">
+      <span style="color:var(--text2);font-size:.9rem"><i class="fa fa-circle-info"></i> Surveillance de ce navigateur : requêtes envoyées par le site et événements de sécurité</span>
+      <button class="tab-btn" onclick="secuRender()"><i class="fa fa-rotate"></i> Actualiser</button>
+      <button class="btn-danger" onclick="SEC.events=[];SEC.net=[];secuRender()"><i class="fa fa-trash"></i> Vider</button>
+    </div>
+    <div class="db-wrap">
+      <h3 class="db-h3">✅ Contrôles de sécurité</h3><div id="secuChecks"></div>
+      <h3 class="db-h3">📡 Requêtes réseau en direct (Firestore, Cloudinary, Auth…)</h3>
+      <div class="users-table-wrap" style="padding:0"><table class="users-table"><thead><tr><th>Heure</th><th>Méthode</th><th>Destination</th><th>Statut</th><th>Durée</th></tr></thead><tbody id="secuNet"></tbody></table></div>
+      <h3 class="db-h3">🛡️ Journal des événements</h3>
+      <div class="users-table-wrap" style="padding:0"><table class="users-table"><thead><tr><th>Heure</th><th>Type</th><th>Détail</th></tr></thead><tbody id="secuEvents"></tbody></table></div>
+    </div>
+  </div>
+
+
+  <!-- Site admin -->
+  <div id="tab-site" class="admin-tab-content" style="display:none">
+    <div style="margin-bottom:1rem"><button class="btn-primary" onclick="cloudImport()">☁️ Importer les données de ce navigateur vers la base partagée</button></div>
+    <div class="site-editor">
+      <h3><i class="fa fa-pen-nib"></i> Modifier le contenu du site</h3>
+      <p class="text-muted">Modifications instantanées sur toutes les pages.</p>
+      <div class="editor-section"><h4>🏷️ Identité du site</h4>
+        <div class="form-row">
+          <div class="form-group"><label>Nom du site</label><input type="text" id="sSiteName"/></div>
+          <div class="form-group"><label>Slogan</label><input type="text" id="sSiteSlogan"/></div>
+        </div>
+      </div>
+      <div class="editor-section"><h4>🏠 Hero — Page d'accueil</h4>
+        <div class="form-group"><label>Tag</label><input type="text" id="sHeroTag"/></div>
+        <div class="form-row">
+          <div class="form-group"><label>Titre ligne 1</label><input type="text" id="sHeroTitle1"/></div>
+          <div class="form-group"><label>Titre ligne 2 (doré)</label><input type="text" id="sHeroTitle2"/></div>
+        </div>
+        <div class="form-group"><label>Sous-titre</label><textarea id="sHeroSub" rows="2"></textarea></div>
+      </div>
+      <div class="editor-section"><h4>🎨 Couleurs</h4>
+        <div class="form-row">
+          <div class="form-group"><label>Accent principal</label><input type="color" id="sColorAccent"/></div>
+          <div class="form-group"><label>Accent secondaire</label><input type="color" id="sColorAccent2"/></div>
+          <div class="form-group"><label>Fond</label><input type="color" id="sColorBg"/></div>
+          <div class="form-group"><label>Cartes</label><input type="color" id="sColorCard"/></div>
+        </div>
+      </div>
+      <div class="editor-section"><h4>🔗 Réseaux sociaux & Contact</h4>
+        <div class="form-row">
+          <div class="form-group"><label>Lien Facebook</label><input type="text" id="sFacebook" placeholder="https://facebook.com/..."/></div>
+          <div class="form-group"><label>Lien WhatsApp</label><input type="text" id="sWhatsapp" placeholder="https://wa.me/237..."/></div>
+        </div>
+        <div class="form-group"><label>Email de contact</label><input type="email" id="sContactEmail" placeholder="contact@fedani.cm"/></div>
+      </div>
+      <div class="editor-section"><h4>📢 Bannière globale</h4>
+        <div class="form-row">
+          <div class="form-group" style="flex:3"><label>Message (vide = masquée)</label><input type="text" id="sBanner"/></div>
+          <div class="form-group"><label>Style</label><select id="sBannerType"><option value="info">ℹ️ Info</option><option value="success">✅ Succès</option><option value="warning">⚠️ Alerte</option><option value="danger">🚨 Danger</option></select></div>
+        </div>
+      </div>
+      <div class="editor-section"><h4>🗒️ Pied de page</h4>
+        <div class="form-group"><textarea id="sFooterMsg" rows="2"></textarea></div>
+      </div>
+      <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-top:1.5rem">
+        <button class="btn-primary big" onclick="saveSiteContent()">💾 Appliquer</button>
+        <button class="btn-ghost" onclick="resetSiteContent()">↺ Réinitialiser</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ══════════ FOOTER ══════════ -->
+<footer id="siteFooter">
+  <div class="footer-top">
+    <div class="footer-brand-col">
+      <div class="footer-brand">
+        <img src="logo.jpg" alt="FEDANI" style="height:32px;object-fit:contain"/>
+        <span><strong>FEDANI</strong> ServiConnect</span>
+      </div>
+      <p class="footer-desc">La première plateforme de services étudiants au Cameroun. Connecte talents et opportunités.</p>
+      <div class="footer-social">
+        <a href="#" id="footerFacebook" class="social-btn" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+        <a href="https://wa.me/237696837926" id="footerWhatsapp" class="social-btn whatsapp-btn" target="_blank" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+        <a href="mailto:fedanisarl1@gmail.com" class="social-btn email-btn" title="Email"><i class="fa fa-envelope"></i></a>
+      </div>
+    </div>
+    <div class="footer-links-col">
+      <h4>Navigation</h4>
+      <a href="#" onclick="goPage('home')">Accueil</a>
+      <a href="#" onclick="goPage('annonces')">Annonces</a>
+      <a href="#" onclick="goPage('services')">Services</a>
+      <a href="#" onclick="goPage('partenaires')">Partenaires</a>
+      <a href="#" onclick="goPage('actualites')">Actualités</a>
+      <a href="#" onclick="goPage('apropos')">À propos</a>
+    </div>
+    <div class="footer-links-col">
+      <h4>Légal & Support</h4>
+      <a href="#" onclick="openFAQ()">FAQ</a>
+      <a href="#" onclick="openPrivacy()">Politique de confidentialité</a>
+      <a href="mailto:fedanisarl1@gmail.com">Contact</a>
+      <a href="tel:+237696837926">+237 696 837 926</a>
+      <a href="https://wa.me/237696837926" target="_blank">WhatsApp</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span id="footerMsg">© 2026 FEDANI ServiConnect. Tous droits réservés.</span>
+  </div>
+</footer>
+
+<!-- ══════════ AI ASSISTANT ══════════ -->
+<div class="ai-fab" id="aiFab" onclick="openAI()" title="Assistant IA FEDANI">
+  <div class="ai-fab-pulse"></div>
+  <i class="fa fa-robot"></i>
+</div>
+
+<div class="ai-panel" id="aiPanel">
+  <div class="ai-header">
+    <div class="ai-title"><span class="ai-icon">🤖</span><div><strong>FedaniAI</strong><small>Assistant intelligent</small></div></div>
+    <button class="ai-close" onclick="closeAI()">✕</button>
+  </div>
+  <div class="ai-messages" id="aiMessages">
+    <div class="ai-msg bot">
+      <span class="ai-avatar">🤖</span>
+      <div class="ai-bubble">Bonjour ! Je suis <strong>FedaniAI</strong>. Je peux t'aider à :<br><br>
+        🔍 <b>Trouver une annonce</b><br>📝 <b>Publier un service</b><br>💳 <b>Comprendre les paiements</b><br>👤 <b>Créer ton compte</b><br>📰 <b>Voir les actualités</b><br>🤝 <b>Devenir partenaire</b><br>❓ <b>Répondre à tes questions</b><br><br>Comment puis-je t'aider ?
+      </div>
+    </div>
+  </div>
+  <div class="ai-quick-btns">
+    <button onclick="aiQuick('Comment trouver un prestataire ?')">🔍 Trouver</button>
+    <button onclick="aiQuick('Comment publier une annonce ?')">📝 Publier</button>
+    <button onclick="aiQuick('Quels sont les modes de paiement ?')">💳 Paiements</button>
+    <button onclick="aiQuick('Comment créer mon compte ?')">👤 Compte</button>
+    <button onclick="aiQuick('Quelles sont les actualités ?')">📰 Actus</button>
+    <button onclick="aiQuick('Comment devenir partenaire ?')">🤝 Partenariat</button>
+  </div>
+  <div class="ai-input-row">
+    <input type="text" id="aiInput" placeholder="Pose ta question..." onkeydown="if(event.key==='Enter')sendAI()"/>
+    <button class="ai-send" onclick="sendAI()"><i class="fa fa-paper-plane"></i></button>
+  </div>
+</div>
+
+<!-- ══════════ PARTNER CHAT PANEL ══════════ -->
+<div class="partner-chat-overlay" id="partnerChatOverlay" onclick="closePartnerChat()"></div>
+<div class="partner-chat-panel" id="partnerChatPanel">
+  <div class="partner-chat-header">
+    <div><strong>💬 Demande de partenariat</strong><small>Discussion avec l'administrateur FEDANI</small></div>
+    <button onclick="closePartnerChat()">✕</button>
+  </div>
+  <div class="partner-chat-messages" id="partnerChatMessages"></div>
+  <div class="partner-chat-input">
+    <input type="text" id="partnerChatInput" placeholder="Votre message..." onkeydown="if(event.key==='Enter')sendPartnerMsg()"/>
+    <button onclick="sendPartnerMsg()"><i class="fa fa-paper-plane"></i></button>
+  </div>
+</div>
+
+<!-- ══════════ FAQ MODAL ══════════ -->
+<div class="modal modal-wide" id="modalFAQ">
+  <button class="modal-close" onclick="closeModals()">✕</button>
+  <h2>❓ Foire Aux Questions</h2>
+  <div class="faq-list">
+    <div class="faq-item"><div class="faq-q" onclick="toggleFAQ(this)">Comment créer un compte ? <i class="fa fa-chevron-down"></i></div><div class="faq-a">Clique sur "S'inscrire" en haut à droite, remplis le formulaire avec ton nom, email et mot de passe. C'est gratuit et instantané !</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="toggleFAQ(this)">Comment publier une annonce ? <i class="fa fa-chevron-down"></i></div><div class="faq-a">Connecte-toi, puis clique sur "Publier" dans le menu. Remplis le formulaire avec toutes les infos de ton service. Tu peux ajouter une photo !</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="toggleFAQ(this)">La plateforme est-elle gratuite ? <i class="fa fa-chevron-down"></i></div><div class="faq-a">Oui, 100% gratuit ! Création de compte, publication d'annonces, contact des prestataires — tout est gratuit.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="toggleFAQ(this)">Comment contacter un prestataire ? <i class="fa fa-chevron-down"></i></div><div class="faq-a">Clique sur une annonce pour voir les détails. Tu peux contacter le prestataire via WhatsApp, téléphone ou email directement depuis la page.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="toggleFAQ(this)">Quels modes de paiement sont acceptés ? <i class="fa fa-chevron-down"></i></div><div class="faq-a">MTN Mobile Money, Orange Money, Express Union, Cash, PayPal, Visa/Mastercard. Le mode est convenu directement entre le client et le prestataire.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="toggleFAQ(this)">Comment modifier ou supprimer mon annonce ? <i class="fa fa-chevron-down"></i></div><div class="faq-a">Va dans "Mes annonces" et clique sur ✏️ pour modifier ou 🗑️ pour supprimer. Simple et rapide !</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="toggleFAQ(this)">Comment devenir partenaire ? <i class="fa fa-chevron-down"></i></div><div class="faq-a">Va sur la page "Partenaires" et clique sur "Nous contacter". Tu peux envoyer un message directement à l'administrateur.</div></div>
+    <div class="faq-item"><div class="faq-q" onclick="toggleFAQ(this)">Comment changer ma photo de profil ? <i class="fa fa-chevron-down"></i></div><div class="faq-a">Va dans "Profil", clique sur ta photo actuelle et sélectionne une nouvelle image depuis ton appareil.</div></div>
+  </div>
+</div>
+
+<!-- ══════════ PRIVACY MODAL ══════════ -->
+<div class="modal modal-wide" id="modalPrivacy">
+  <button class="modal-close" onclick="closeModals()">✕</button>
+  <h2>🔒 Politique de confidentialité</h2>
+  <div class="privacy-content" style="max-height:70vh;overflow-y:auto">
+    <h3>1. Collecte des données</h3>
+    <p>FEDANI ServiConnect collecte les informations que vous fournissez lors de l'inscription : nom, email, téléphone, ville. Ces données sont utilisées uniquement pour le fonctionnement de la plateforme.</p>
+    <h3>2. Utilisation des données</h3>
+    <p>Vos données personnelles sont utilisées pour : personnaliser votre expérience, afficher votre profil aux autres utilisateurs, vous envoyer des notifications importantes liées à la plateforme.</p>
+    <h3>3. Protection des données</h3>
+    <p>Vos données (compte, annonces) sont stockées de façon sécurisée sur Firebase (Google Cloud) et les images sur Cloudinary. Les mots de passe sont gérés par Firebase Authentication et ne sont jamais visibles par FEDANI. FEDANI ServiConnect ne vend pas vos données à des tiers et ne partage pas vos informations personnelles sans votre consentement.</p>
+    <h3>4. Cookies</h3>
+    <p>La plateforme utilise le stockage du navigateur et les services Firebase pour maintenir votre session connectée et mémoriser vos préférences. Aucun cookie publicitaire n'est utilisé.</p>
+    <h3>5. Vos droits</h3>
+    <p>Vous pouvez à tout moment modifier ou supprimer vos informations personnelles depuis votre profil. Pour toute demande de suppression de compte, contactez : fedanisarl1@gmail.com</p>
+    <h3>6. Contact</h3>
+    <p>Pour toute question relative à la confidentialité : <a href="mailto:fedanisarl1@gmail.com" style="color:var(--accent)">fedanisarl1@gmail.com</a> | Tél : +237 696 837 926</p>
+  </div>
+</div>
+
+<!-- ══════════ MODALS ══════════ -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModals()"></div>
+
+<div class="modal" id="modalLogin">
+  <button class="modal-close" onclick="closeModals()">✕</button>
+  <h2>Connexion</h2>
+  <button class="btn-google" onclick="loginWithGoogle()"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" style="width:20px"/> Se connecter avec Google</button>
+  <button class="btn-google btn-github" onclick="loginWithGithub()"><i class="fa-brands fa-github" style="font-size:1.15rem"></i> Se connecter avec GitHub</button>
+  <button class="btn-google btn-facebook" onclick="loginWithFacebook()"><i class="fa-brands fa-facebook" style="font-size:1.15rem"></i> Se connecter avec Facebook</button>
+  <div class="modal-divider"><span>ou</span></div>
+  <form onsubmit="doLogin(event)">
+    <div class="form-group"><label>Email</label><input type="email" id="loginEmail" required/></div>
+    <div class="form-group"><label>Mot de passe</label><input type="password" id="loginPass" required/></div>
+    <div class="form-error" id="loginError"></div>
+    <p style="text-align:right;margin:.25rem 0 .75rem;font-size:.82rem"><a href="#" onclick="resetPassword();return false" style="color:var(--accent)">Mot de passe oublié ?</a></p>
+    <button type="submit" class="btn-primary big" style="width:100%">Se connecter</button>
+  </form>
+  <p class="modal-switch">Pas encore inscrit ? <a href="#" onclick="openModal('register')">S'inscrire</a></p>
+</div>
+
+<div class="modal" id="modalRegister">
+  <button class="modal-close" onclick="closeModals()">✕</button>
+  <h2>Créer un compte</h2>
+  <button class="btn-google" onclick="registerWithGoogle()"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" style="width:20px"/> Continuer avec Google</button>
+  <button class="btn-google btn-github" onclick="registerWithGithub()"><i class="fa-brands fa-github" style="font-size:1.15rem"></i> Continuer avec GitHub</button>
+  <button class="btn-google btn-facebook" onclick="registerWithFacebook()"><i class="fa-brands fa-facebook" style="font-size:1.15rem"></i> Continuer avec Facebook</button>
+  <div class="modal-divider"><span>ou</span></div>
+  <form onsubmit="doRegister(event)">
+    <div class="form-group"><label>Nom complet</label><input type="text" id="regNom" required/></div>
+    <div class="form-group"><label>Email</label><input type="email" id="regEmail" required/></div>
+    <div class="form-group"><label>Mot de passe</label><input type="password" id="regPass" required minlength="6"/></div>
+    <div class="form-error" id="regError"></div>
+    <button type="submit" class="btn-primary big" style="width:100%">S'inscrire</button>
+  </form>
+  <p class="modal-switch">Déjà inscrit ? <a href="#" onclick="openModal('login')">Se connecter</a></p>
+</div>
+
+<div class="modal modal-wide" id="modalEdit">
+  <button class="modal-close" onclick="closeModals()">✕</button>
+  <h2>✏️ Modifier l'annonce</h2>
+  <div style="max-height:75vh;overflow-y:auto;padding-right:.25rem">
+    <form onsubmit="saveEdit(event)">
+      <input type="hidden" id="editId"/>
+      <div class="img-upload-zone small" onclick="document.getElementById('editImgInput').click()">
+        <div class="img-upload-placeholder" id="editImgPlaceholder"><i class="fa fa-image"></i><p>Changer l'image</p></div>
+        <img id="editImgPreview" style="display:none" alt=""/>
+        <button type="button" class="img-remove-btn" id="editImgRemoveBtn" style="display:none" onclick="removeImage(event,'editImgPreview','editImgPlaceholder','editImgRemoveBtn','editImgInput')">✕</button>
+        <input type="file" id="editImgInput" accept="image/*" style="display:none" onchange="previewImage(this,'editImgPreview','editImgPlaceholder','editImgRemoveBtn')"/>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Titre</label><input type="text" id="editTitre" required/></div>
+        <div class="form-group"><label>Catégorie</label><select id="editCategorie" required><option>Cours</option><option>Correction</option><option>Programmation</option><option>Design</option><option>Recherche</option><option>Traduction</option><option>Rédaction</option><option>Musique</option><option>Sport</option><option>Autre</option></select></div>
+      </div>
+      <div class="form-group"><label>Description</label><textarea id="editDesc" rows="4" required></textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label>Ville</label><select id="editVille" required><option>Douala</option><option>Yaoundé</option><option>Bafoussam</option><option>Bandjoun</option><option>Buea</option><option>Bamenda</option><option>Autre</option></select></div>
+        <div class="form-group"><label>Quartier</label><input type="text" id="editQuartier"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Prix</label><input type="text" id="editPrix"/></div>
+        <div class="form-group"><label>Mode</label><select id="editMode"><option value="">Non précisé</option><option>En personne</option><option>En ligne</option><option>Les deux</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Téléphone</label><input type="tel" id="editTel" required/></div>
+        <div class="form-group"><label>Email</label><input type="email" id="editEmail"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Paiement</label><select id="editPaiement"><option value="">Non précisé</option><option>MTN Mobile Money</option><option>Orange Money</option><option>Express Union</option><option>Cash</option><option>PayPal</option><option>Tout mode</option></select></div>
+        <div class="form-group"><label>Disponibilité</label><input type="text" id="editDispo"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Tags</label><input type="text" id="editTags"/></div>
+        <div class="form-group"><label>Statut</label><select id="editVisible"><option value="true">✅ Visible</option><option value="false">🙈 Masquée</option></select></div>
+      </div>
+      <button type="submit" class="btn-primary big" style="width:100%">💾 Sauvegarder</button>
+    </form>
+  </div>
+</div>
+
+<div class="modal modal-wide" id="modalEditUser">
+  <button class="modal-close" onclick="closeModals()">✕</button>
+  <h2>✏️ Modifier l'utilisateur</h2>
+  <form onsubmit="saveUserEdit(event)">
+    <input type="hidden" id="editUserId"/>
+    <div class="form-row">
+      <div class="form-group"><label>Nom</label><input type="text" id="editUserNom" required/></div>
+      <div class="form-group"><label>Email</label><input type="email" id="editUserEmail" required/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Téléphone</label><input type="tel" id="editUserTel"/></div>
+      <div class="form-group"><label>Ville</label><select id="editUserVille"><option value="">—</option><option>Douala</option><option>Yaoundé</option><option>Bafoussam</option><option>Autre</option></select></div>
+    </div>
+    <div class="form-group"><label>Rôle</label><select id="editUserRole"><option value="user">Utilisateur</option><option value="admin">Administrateur</option></select></div>
+    <div class="form-group"><label>Nouveau mot de passe (vide = inchangé)</label><input type="password" id="editUserPass" minlength="6"/></div>
+    <button type="submit" class="btn-primary big" style="width:100%">💾 Sauvegarder</button>
+  </form>
+</div>
+
+<!-- Add/Edit Service Modal -->
+<div class="modal modal-wide" id="modalService">
+  <button class="modal-close" onclick="closeModals()">✕</button>
+  <h2 id="serviceModalTitle">➕ Ajouter un service</h2>
+  <form onsubmit="saveService(event)">
+    <input type="hidden" id="serviceId"/>
+    <div class="form-row">
+      <div class="form-group"><label>Icône (emoji)</label><input type="text" id="serviceIcon" placeholder="📚" required/></div>
+      <div class="form-group"><label>Titre</label><input type="text" id="serviceTitle" required/></div>
+    </div>
+    <div class="form-group"><label>Description</label><textarea id="serviceDesc" rows="3" required></textarea></div>
+    <div class="form-group"><label>Points clés (un par ligne)</label><textarea id="servicePoints" rows="3" placeholder="Niveaux : Primaire, Collège, Lycée&#10;Séances individuelles ou en groupe&#10;Suivi personnalisé"></textarea></div>
+    <div class="form-group"><label>📷 Image (optionnel)</label><input type="hidden" id="serviceImg"/><small class="pick-hint">Touche le bouton, choisis une photo de ton téléphone.</small><input type="file" class="file-pick" accept="image/*" onchange="pickImage(this,'serviceImg')" style="margin-top:.5rem;width:100%"/></div>
+    <div class="form-group"><label>Description détaillée (page de l'offre)</label><textarea id="serviceLong" rows="4"></textarea></div>
+    <div class="form-group"><label>Catégorie filtre</label><select id="serviceFilter"><option value="">Cours</option><option>Correction</option><option>Programmation</option><option>Design</option><option>Recherche</option><option>Traduction</option><option>Rédaction</option><option>Musique</option><option>Sport</option><option>Autre</option></select></div>
+    <button type="submit" class="btn-primary big" style="width:100%">💾 Sauvegarder</button>
+  </form>
+</div>
+
+<!-- Add/Edit Team Modal -->
+<div class="modal modal-wide" id="modalTeam">
+  <button class="modal-close" onclick="closeModals()">✕</button>
+  <h2 id="teamModalTitle">➕ Ajouter un membre</h2>
+  <form onsubmit="saveTeamMember(event)">
+    <input type="hidden" id="teamMemberId"/>
+    <div class="form-row">
+      <div class="form-group"><label>Nom</label><input type="text" id="teamNom" required/></div>
+      <div class="form-group"><label>Rôle / Titre</label><input type="text" id="teamRole" required placeholder="CEO & Fondateur"/></div>
+    </div>
+    <div class="form-group"><label>Description</label><textarea id="teamDesc" rows="3"></textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label>Couleur avatar</label><input type="color" id="teamColor" value="#00aaff"/></div>
+      <input type="hidden" id="teamPhoto"/>
+    </div>
+    <div class="form-group"><label>📷 Sélectionner une photo</label>
+      <input type="file" id="teamPhotoFile" class="file-pick" accept="image/*" onchange="previewTeamPhoto(this)" style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:.5rem;color:var(--text);width:100%"/>
+      <div id="teamPhotoPreviewWrap" style="display:none;margin-top:.5rem;text-align:center"><img id="teamPhotoPreview" src="" style="width:80px;height:80px;object-fit:cover;border-radius:50%;border:2px solid var(--accent)"/></div>
+    </div>
+    <button type="submit" class="btn-primary big" style="width:100%">💾 Sauvegarder</button>
+  </form>
+</div>
+
+<!-- Add Actu Modal -->
+<div class="modal modal-wide" id="modalActu">
+  <button class="modal-close" onclick="closeModals()">✕</button>
+  <h2 id="actuModalTitle">➕ Ajouter une actualité</h2>
+  <form onsubmit="saveActu(event)">
+    <input type="hidden" id="actuId"/>
+    <div class="form-row">
+      <div class="form-group"><label>Titre</label><input type="text" id="actuTitle" required/></div>
+      <div class="form-group"><label>Type</label><select id="actuType"><option value="actu">📰 Actualité</option><option value="pro">💼 Professionnel</option><option value="event">📅 Événement</option></select></div>
+    </div>
+    <div class="form-group"><label>Résumé court</label><input type="text" id="actuSummary" required/></div>
+    <div class="form-group"><label>Contenu complet</label><textarea id="actuContent" rows="5" required></textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label>📷 Image (optionnel)</label><input type="hidden" id="actuImg"/><small class="pick-hint">Touche le bouton, choisis une photo de ton téléphone.</small><input type="file" class="file-pick" accept="image/*" onchange="pickImage(this,'actuImg')" style="margin-top:.5rem;width:100%"/></div>
+      <div class="form-group"><label>Auteur</label><input type="text" id="actuAuthor" placeholder="Équipe FEDANI"/></div>
+    </div>
+    <button type="submit" class="btn-primary big" style="width:100%">💾 Sauvegarder</button>
+  </form>
+</div>
+
+<!-- Add Partner Modal -->
+<div class="modal modal-wide" id="modalPartner">
+  <button class="modal-close" onclick="closeModals()">✕</button>
+  <h2 id="partnerModalTitle">➕ Ajouter un partenaire</h2>
+  <form onsubmit="savePartner(event)">
+    <input type="hidden" id="partnerId"/>
+    <div class="form-row">
+      <div class="form-group"><label>Nom du partenaire</label><input type="text" id="partnerName" required/></div>
+      <div class="form-group"><label>Badge / Type</label><input type="text" id="partnerBadge" placeholder="Académique, Fintech..." required/></div>
+    </div>
+    <div class="form-group"><label>Description</label><textarea id="partnerDesc" rows="3" required></textarea></div>
+    <div class="form-row">
+      <input type="hidden" id="partnerLogo"/>
+      <div class="form-group"><label>Site web (optionnel)</label><input type="text" id="partnerUrl" placeholder="https://..."/></div>
+    </div>
+    <div class="form-group"><label>📷 Sélectionner le logo</label>
+      <input type="file" id="partnerLogoFile" class="file-pick" accept="image/*" onchange="previewPartnerLogo(this)" style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:.5rem;color:var(--text);width:100%"/>
+      <div id="partnerLogoPreviewWrap" style="display:none;margin-top:.5rem;text-align:center"><img id="partnerLogoPreview" src="" style="height:60px;object-fit:contain;border-radius:8px;border:1px solid var(--border);padding:4px;background:var(--bg3)"/></div>
+    </div>
+    <button type="submit" class="btn-primary big" style="width:100%">💾 Sauvegarder</button>
+  </form>
+</div>
+
+<!-- Modal paiement -->
+<div class="modal" id="modalPaiement">
+  <button class="modal-close" onclick="closeModals()">✕</button>
+  <h2>💳 Payer ce service</h2>
+  <div id="paiementContent"></div>
+</div>
+
+<!-- Image viewer -->
+<div class="img-viewer" id="imgViewer" onclick="closeImgViewer()">
+  <button class="img-viewer-close" onclick="closeImgViewer()">✕</button>
+  <img id="imgViewerImg" alt=""/>
+</div>
+
+<!-- ══════════ SHARE MODAL ══════════ -->
+<div class="modal" id="modalShare" style="text-align:center">
+  <button class="modal-close" onclick="closeModals()">✕</button>
+  <h2>🔗 Partager</h2>
+  <p style="color:var(--text2);font-size:.9rem;margin-bottom:1.5rem">Choisissez une plateforme pour partager :</p>
+  <div class="share-modal-grid" id="shareModalGrid"></div>
+  <div style="margin-top:1.25rem;display:flex;gap:.5rem">
+    <input type="text" id="shareLinkInput" readonly style="flex:1;font-size:.8rem"/>
+    <button class="btn-primary" onclick="copyShareLink()" style="white-space:nowrap"><i class="fa fa-copy"></i> Copier</button>
+  </div>
+</div>
+
+<!-- Scroll to top -->
+<button id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Haut de page">
+  <i class="fa fa-chevron-up"></i>
+</button>
+
+<div class="toast" id="toast"></div>
+<script src="script.js"></script>
+<script type="module" src="firebase-layer.js"></script>
+<script type="module" src="cloud-sync.js"></script>
+<script type="module" src="boutique.js"></script>
+</body>
+</html>

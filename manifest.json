@@ -1,0 +1,14 @@
+{
+  "name": "FEDANI Agence Digitale",
+  "short_name": "FEDANI",
+  "description": "Services numériques, formations, annonces et portfolio — FEDANI Agence Digitale (Cameroun)",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#050810",
+  "theme_color": "#00aaff",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "logo.jpg", "sizes": "192x192", "type": "image/jpeg", "purpose": "any maskable" },
+    { "src": "logo.jpg", "sizes": "512x512", "type": "image/jpeg", "purpose": "any maskable" }
+  ]
+}

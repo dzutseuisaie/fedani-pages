@@ -1,0 +1,58 @@
+[
+  {
+    "id": "IADBCXKFxZe9DNbOCzD1WLpliVC2",
+    "data": {
+      "tel": "",
+      "date": 1791206373436,
+      "email": "fedanidigital@gmail.com",
+      "bio": "",
+      "ville": "",
+      "nom": "fedanidigital",
+      "avatar": "",
+      "googleAuth": false,
+      "role": "user"
+    }
+  },
+  {
+    "id": "OFC9yJN8bTVj6RW33CmYU6s2ZCe2",
+    "data": {
+      "date": 1791202393540,
+      "googleAuth": true,
+      "bio": "",
+      "nom": "Isaïe Dzutseu",
+      "role": "user",
+      "avatar": "",
+      "ville": "",
+      "tel": "",
+      "email": "dzutseuisaie@gmail.com"
+    }
+  },
+  {
+    "id": "SwUjLm5sGtYWrXipkqssvZlCHOs2",
+    "data": {
+      "date": 1791198547300,
+      "googleAuth": false,
+      "bio": "Vvbbv",
+      "nom": "Feuko Isaïe",
+      "role": "user",
+      "avatar": "https://res.cloudinary.com/pduc9l0x/image/upload/q_auto,f_auto,w_300,h_300,c_fill,g_auto/v1791199713/ea2tmm5e0ldnadhwfqbr.png",
+      "tel": "696837926",
+      "ville": "Douala",
+      "email": "fedanisarl1@gmail.com"
+    }
+  },
+  {
+    "id": "trXAmlK1VUUXRb4Mjgo8rsU8GeN2",
+    "data": {
+      "bio": "",
+      "avatar": "",
+      "nom": "Vvb",
+      "ville": "",
+      "googleAuth": false,
+      "email": "admin@fedani.cm",
+      "date": 1791201130347,
+      "tel": "",
+      "role": "admin"
+    }
+  }
+]
